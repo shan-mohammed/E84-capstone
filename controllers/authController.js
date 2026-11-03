@@ -149,8 +149,7 @@ console.log("JWT generated:", !!token);
       error: error.message
     });
   }
-};
-
+}; 
 
 module.exports = {
   registerUser,

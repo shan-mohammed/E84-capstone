@@ -17,8 +17,6 @@ const router = express.Router();
 
 
 
-// upload image
-router.post("/upload-image",upload.single("image"),uploadProductImage)
 // Get all products
 router.get("/", getProducts);
 
@@ -29,9 +27,10 @@ router.get("/:id", getProductById);
 router.post("/",authMiddleware,authorize("admin"),upload.single("image"), createProduct);
 
 // Update a product
-router.put("/:id", updateProduct);
+router.put("/:id", updateProduct); 
 
 // Delete a product
 router.delete("/:id", deleteProduct); 
-
+   
+  
 module.exports = router; 
