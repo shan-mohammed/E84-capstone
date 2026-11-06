@@ -27,8 +27,13 @@ router.get("/:id", getProductById);
 router.post("/",authMiddleware,authorize("admin"),upload.single("image"), createProduct);
 
 // Update a product
-router.put("/:id", updateProduct); 
-
+router.put(
+  "/:id",
+  authMiddleware,
+  authorize("admin"),
+  upload.single("image"),
+  updateProduct
+);
 // Delete a product
 router.delete("/:id", deleteProduct); 
    

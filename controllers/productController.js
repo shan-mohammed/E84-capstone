@@ -147,29 +147,92 @@ const createProduct = async (req, res) => {
 
 // UPDATE a product
 const updateProduct = async (req, res) => {
-  try {
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        returnDocument:"after",
-        runValidators: true,
-      }
-    );
+  let uploadedImage;
 
-    if (!product) {
+  try {
+    const { id } = req.params;
+
+    // Find existing product
+    const existingProduct = await Product.findById(id);
+
+    if (!existingProduct) {
       return res.status(404).json({
         success: false,
         message: "Product not found",
       });
     }
 
-    res.status(200).json({
+    // Prepare updated product details
+    const updateData = {
+      ...req.body,
+      price: req.body.price !== undefined
+        ? Number(req.body.price)
+        : existingProduct.price,
+
+      rating: req.body.rating !== undefined
+        ? Number(req.body.rating)
+        : existingProduct.rating,
+    };
+
+    // Upload new image if selected
+    if (req.file) {
+      uploadedImage = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: "ecommerce-products",
+            resource_type: "image",
+          },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+          }
+        );
+
+        stream.end(req.file.buffer);
+      });
+
+      // Update Cloudinary image details
+      updateData.imageUrl = uploadedImage.secure_url;
+      updateData.imagePublicId = uploadedImage.public_id;
+    }
+
+    // Update product in MongoDB
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      updateData,
+      {
+        returnDocument: "after",
+        runValidators: true,
+      }
+    );
+
+    // Delete old image after successful update
+    if (req.file && existingProduct.imagePublicId) {
+      try {
+        await cloudinary.uploader.destroy(
+          existingProduct.imagePublicId
+        );
+      } catch (deleteError) {
+        console.error("Old image deletion failed:", deleteError);
+      }
+    }
+
+    return res.status(200).json({
       success: true,
       message: "Product updated successfully",
-      data: product,
+      data: updatedProduct,
     });
+
   } catch (error) {
+    console.error("Update product error:", error);
+
+    // Delete newly uploaded image if update fails
+    if (uploadedImage) {
+      await cloudinary.uploader.destroy(
+        uploadedImage.public_id
+      ).catch(console.error);
+    }
+
     if (error.name === "CastError") {
       return res.status(400).json({
         success: false,
@@ -184,14 +247,13 @@ const updateProduct = async (req, res) => {
       });
     }
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-    
-      message: "Failed to update product" 
+      message: "Failed to update product",
+      error: error.message,
     });
   }
 };
-
 // DELETE a product
 const deleteProduct = async (req, res) => {
   try {
@@ -203,10 +265,12 @@ const deleteProduct = async (req, res) => {
         message: "Product not found",
       });
     }
+console.log("Deleted product:", product.title);
 
-    res.status(200).json({
+   return res.status(200).json({
       success: true,
       message: "Product deleted successfully",
+      data:product,
     });
   } catch (error) {
     if (error.name === "CastError") {
@@ -216,12 +280,13 @@ const deleteProduct = async (req, res) => {
       });
     }
 
-    res.status(500).json({
+   return res.status(500).json({
       success: false,
       message: "Failed to delete product",
+      error:error.message
     });
   }
-};
+}; 
 
 module.exports = {
   uploadProductImage,
