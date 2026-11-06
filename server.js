@@ -22,7 +22,6 @@ app.use(
 )
 
 
-
 const PORT = process .env.PORT 
 
 
@@ -38,7 +37,8 @@ app.get("/",(req,res)=>{
 //Routes
 app.use("/api/products",productRoutes); 
 app.use("/api/auth", authRoutes);
-
+app.use("/api/recommendations",require("./routes/recommendationRoutes"))
+app.use("/api/activity",require("./routes/activityRoutes"));
 // data base
 connectDB(); 
 
