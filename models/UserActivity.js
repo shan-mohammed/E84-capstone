@@ -7,6 +7,11 @@ const userActivitySchema = new mongoose.Schema(
             ref:"User",
             required: true,
         },
+          productId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+      required: true,
+    },
         action:{
             type:String,
             enum:["view", "cart", "wishlist","purchase"],
