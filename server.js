@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser");
 
 const productRoutes =require("./routes/productRoutes")
 const authRoutes = require("./routes/authRoutes");
+const orderRoutes = require("./routes/orderRoutes");
 
 const app =express();
 
@@ -39,6 +40,7 @@ app.use("/api/products",productRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/recommendations",require("./routes/recommendationRoutes"))
 app.use("/api/activity",require("./routes/activityRoutes"));
+app.use("/api/orders", orderRoutes);
 // data base
 connectDB(); 
 
