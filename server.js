@@ -76,7 +76,7 @@ app.use(
         ].filter(Boolean),
         credentials: true,
     })
-);
+); 
 
 // Test route
 app.get("/", (req, res) => {
