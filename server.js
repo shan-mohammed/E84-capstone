@@ -77,7 +77,6 @@ app.use(
     credentials: true,
   })
 );
-); 
 
 // Test route
 app.get("/", (req, res) => {
