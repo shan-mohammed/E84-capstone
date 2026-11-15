@@ -4,6 +4,6 @@ const router = express.Router();
 
 const {getRecommendations} =require("../controllers/recommendationController")
 
-router.get("/:productId",authMiddleware, getRecommendations)
+router.get("/",authMiddleware, getRecommendations)
 
 module.exports =router;
