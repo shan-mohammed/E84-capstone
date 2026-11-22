@@ -10,7 +10,6 @@ const {
 } = require("../controllers/productController");
 const upload = require("../middlewares/upload")
 const authMiddleware = require("../middlewares/authmiddleware")
-const roleMiddleware = require("../middlewares/rolemiddleware");
 const authorize = require("../middlewares/rolemiddleware");
 
 const router = express.Router();
